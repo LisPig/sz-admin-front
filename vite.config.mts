@@ -22,7 +22,6 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
     plugins: [
       vue(),
       vueJsx(),
-      vueDevTools(),
       // 使用 svg 图标
       createSvgIconsPlugin({
         iconDirs: [resolve(process.cwd(), 'src/assets/icons')],
