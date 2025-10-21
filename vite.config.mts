@@ -52,6 +52,9 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
         }
       }
     },
+    optimizeDeps: {
+      include: ['@wangeditor/editor-for-vue']
+    },
     server: {
       host: '0.0.0.0',
       port: Number(env.VITE_PORT),

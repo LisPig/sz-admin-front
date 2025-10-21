@@ -49,19 +49,50 @@ import { useHandleData } from '@/hooks/useHandleData';
 import { getArticleList, addArticle, editArticle, deleteArticle } from '@/api/modules/article';
 import ArticleForm from '@/views/articleManage/components/articleForm.vue';
 import type { ColumnProps, ProTableInstance, SearchProps } from '@/components/ProTable/interface';
-import { ref } from 'vue';
+import { ref, h } from 'vue';
+import { useDict } from '@/hooks/useDict';
+import { useDictOptions } from '@/hooks/useDictOptions';
 
 defineOptions({
   name: 'articleManage'
 });
 
+useDict(['article_type']);
+
 // 表格配置项
 const columns: ColumnProps<any>[] = [
   { type: 'selection', width: 80, selectable: row => row.isLock !== 'T' },
   { prop: 'id', label: '编号', width: 80 },
-  { prop: 'picture', label: '图片地址' },
-  { prop: 'status', tag: true, label: '状态' },
+  { 
+    prop: 'avatar', 
+    label: '文章头图',
+    align: 'center',
+    render: (scope) => {
+      return scope.row.avatar 
+        ? h('div', { style: { width: '100px', height: '60px', margin: '0 auto' } }, [
+            h('img', {
+              src: scope.row.avatar,
+              style: { width: '100%', height: '100%', objectFit: 'cover' },
+            })
+          ])
+        : h('span', '暂无图片');
+    }
+  },
+  { prop: 'title', label: '文章标题', width: 300 },
+  {
+    prop: 'type',
+    label: '文章类型',
+    enum: useDictOptions('article_type'),
+    fieldNames: {
+      label: 'codeName',
+      value: 'id',
+      tagType: 'callbackShowStyle'
+    },
+    width: 150
+  },
+  { prop: 'author', label: '文章作者', width: 120 },
   { prop: 'sort', label: '排序' },
+  { prop: 'operation', label: '操作', width: 180, fixed: 'right' }
 ];
 // 表格配置项
 const searchColumns: SearchProps[] = [
@@ -78,7 +109,7 @@ const roleFormRef = ref<any>();
 const openBannerForm = (title: string, row = {}, isAdd = true) => {
   const params: View.DefaultParams = {
     title,
-    row: isAdd ? { status: 1, sort: 0 } : { ...row },
+    row: isAdd ? { sort: 0 } : { ...row },
     api: isAdd ? addArticle : editArticle,
     getTableList: proTableRef.value?.getTableList
   };

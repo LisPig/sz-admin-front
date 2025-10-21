@@ -70,7 +70,7 @@ const uploadHeaders = computed(() => ({
 }));
 
 const rules = ref({
-  roleName: [{ required: true, message: '请填写角色名称' }]
+  
 });
 
 const visible = ref(false);
