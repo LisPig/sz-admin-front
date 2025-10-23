@@ -94,14 +94,14 @@ const acceptParams = (params: View.DefaultParams) => {
 // 文件上传校验
 const beforeUpload = (file:any) => {
   const isImage = file.type.includes('image/');
-  const isLt2MB = file.size / 1024 / 1024 < 2;
+  const isLt2MB = file.size / 1024 / 1024 < 5;
 
   if (!isImage) {
     ElMessage.error('只能上传图片文件！');
     return false;
   }
   if (!isLt2MB) {
-    ElMessage.error('图片大小不能超过 2MB！');
+    ElMessage.error('图片大小不能超过 5MB！');
     return false;
   }
   return true;

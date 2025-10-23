@@ -7,8 +7,8 @@
       </div>
       <div class="login-form">
         <div class="login-logo">
-          <img class="login-icon" src="@/assets/images/logo.svg" alt="" />
-          <h2 class="logo-text">钱库高级中学</h2>
+          <img class="login-icon" src="@/assets/images/logo.png" alt="" />
+          <h2 class="logo-text">钱高管理平台</h2>
         </div>
         <LoginForm />
       </div>
