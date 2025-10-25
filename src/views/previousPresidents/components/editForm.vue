@@ -1,19 +1,19 @@
 <template>
-  <el-dialog v-model="visible" :title="`${paramsProps.title}`" :destroy-on-close="true" width="1200px" draggable append-to-body>
+  <el-dialog v-model="visible" :title="`${paramsProps.title}`" :destroy-on-close="true" width="580px" draggable append-to-body>
     <el-form
       ref="ruleFormRef"
-      label-width="100px"
+      label-width="120px"
       label-suffix=" :"
       :rules="rules"
       :model="paramsProps.row"
       @submit.enter.prevent="handleSubmit"
     >
-      <!-- 轮播图上传 -->
-      <el-form-item label="文章头图" prop="avatar">
+      <!-- 头像上传 -->
+      <el-form-item label="头像" prop="avatar">
         <el-upload
           class="avatar-uploader"
           action="/api/sys-file/upload"
-          :data="{'dirTag':'article'}"
+          :data="{'dirTag':'avatar'}"
           :headers="uploadHeaders"
           :show-file-list="false"
           :on-success="handleUploadSuccess"
@@ -24,48 +24,31 @@
         </el-upload>
       </el-form-item>
 
-      <!-- 文章标题 -->
-       <el-form-item label="文章标题" prop="title">
-        <el-input v-model="paramsProps.row.title"></el-input>
+      <!-- 姓名 -->
+       <el-form-item label="姓名" prop="name">
+        <el-input v-model="paramsProps.row.name"></el-input>
        </el-form-item>
 
-       <!-- 文章类型 -->
-       <el-form-item label="文章类型" prop="type">
-        <el-select v-model="paramsProps.row.type">
-          <el-option v-for="item in articleType" :key="item.id" :label="item.codeName" :value="Number(item.id)" />
-        </el-select>
+      <!-- 任职开始时间 -->
+       <el-form-item label="任职开始时间" prop="startTime">
+        <el-input v-model="paramsProps.row.startTime"></el-input>
        </el-form-item>
 
-       <!-- 文章作者 -->
-       <el-form-item label="文章作者" prop="author">
-        <el-input v-model="paramsProps.row.author"></el-input>
+       <!-- 任职结束时间 -->
+       <el-form-item label="任职结束时间" prop="endTime">
+        <el-input v-model="paramsProps.row.endTime"></el-input>
        </el-form-item>
 
-      <!-- 排序字段 -->
-      <el-form-item label="排序" prop="sort">
-        <el-input-number
-          v-model="paramsProps.row.sort"
-          :min="0"
-          :max="100"
-          controls-position="right"
-        />
-      </el-form-item>
-
-      <!-- 内容类型 -->
-       <el-form-item label="内容类型" prop="contentType">
-        <el-radio-group v-model="paramsProps.row.contentType">
-          <el-radio value="html">富文本</el-radio>
-          <el-radio value="link">外链</el-radio>
-        </el-radio-group>
+       <!-- 职务 -->
+       <el-form-item label="职务" prop="position">
+        <el-input v-model="paramsProps.row.position"></el-input>
        </el-form-item>
 
-      <!-- 文章内容 -->
-       <el-form-item label="文章内容" prop="content" v-if="paramsProps.row.contentType==='html'">
-        <WangEditor v-model="paramsProps.row.content" />
+       <!-- 描述 -->
+       <el-form-item label="描述" prop="description">
+        <el-input v-model="paramsProps.row.description"></el-input>
        </el-form-item>
-       <el-form-item label="外链地址" prop="content" v-else>
-        <el-input v-model="paramsProps.row.content"></el-input>
-       </el-form-item>
+
     </el-form>
     <template #footer>
       <el-button @click="visible = false"> 取消 </el-button>
@@ -79,15 +62,11 @@ import { ref, computed } from 'vue';
 import { ElMessage } from 'element-plus';
 import { Plus } from '@element-plus/icons-vue';
 import { useUserStore } from '@/stores/modules/user';
-import WangEditor from '@/components/WangEditor/WangEditor.vue'; // 引入编辑器组件
 const userStore = useUserStore();
-import { useDictOptions } from '@/hooks/useDictOptions';
 
 defineOptions({
-  name: 'bannerForm'
+  name: 'editForm'
 });
-
-const articleType = useDictOptions('article_type');
 
 // 动态计算请求头
 const uploadHeaders = computed(() => ({
@@ -96,22 +75,23 @@ const uploadHeaders = computed(() => ({
 }));
 
 const rules = ref({
-  title: [{ required: true, message: '请填写文章标题' }],
-  type: [{ required: true, message: '请选择文章类型' }],
-  contentType: [{ required: true, message: '请选择内容类型' }],
+  avatar: [{ required: true, message: '请上传头像' }],
+  name: [{ required: true, message: '请填写姓名' }],
+  startTime: [{ required: true, message: '请填写任职开始时间' }],
+  endTime: [{ required: true, message: '请填写任职结束时间' }],
+  position: [{ required: true, message: '请填写职务' }],
 });
 
 const visible = ref(false);
 const paramsProps = ref<View.DefaultParams>({
   title: '',
   row: {
-    picture: '',
-    title: '',
-    type: '',
-    author: '',
-    sort: 0,
-    contentType: '',
-    content: '',
+    avatar: '',
+    name: '',
+    startTime: '',
+    endTime: '',
+    position: '',
+    description: '',
   },
   api: undefined,
   getTableList: undefined
