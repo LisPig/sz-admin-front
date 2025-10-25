@@ -18,6 +18,7 @@
           :show-file-list="false"
           :on-success="handleUploadSuccess"
           :before-upload="beforeUpload"
+          :disabled="disabled"
         >
           <img v-if="paramsProps.row.avatar" :src="paramsProps.row.avatar" class="avatar" />
           <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
@@ -26,19 +27,19 @@
 
       <!-- 文章标题 -->
        <el-form-item label="文章标题" prop="title">
-        <el-input v-model="paramsProps.row.title"></el-input>
+        <el-input v-model="paramsProps.row.title" :disabled="disabled"></el-input>
        </el-form-item>
 
        <!-- 文章类型 -->
        <el-form-item label="文章类型" prop="type">
-        <el-select v-model="paramsProps.row.type">
-          <el-option v-for="item in articleType" :key="item.id" :label="item.codeName" :value="Number(item.id)" />
+        <el-select v-model="paramsProps.row.type" :disabled="disabled">
+          <el-option v-for="item in articleType" :key="item.id" :label="item.codeName" :value="String(item.id)" />
         </el-select>
        </el-form-item>
 
        <!-- 文章作者 -->
        <el-form-item label="文章作者" prop="author">
-        <el-input v-model="paramsProps.row.author"></el-input>
+        <el-input v-model="paramsProps.row.author" :disabled="disabled"></el-input>
        </el-form-item>
 
       <!-- 排序字段 -->
@@ -48,12 +49,13 @@
           :min="0"
           :max="100"
           controls-position="right"
+          :disabled="disabled"
         />
       </el-form-item>
 
       <!-- 内容类型 -->
        <el-form-item label="内容类型" prop="contentType">
-        <el-radio-group v-model="paramsProps.row.contentType">
+        <el-radio-group v-model="paramsProps.row.contentType" :disabled="disabled">
           <el-radio value="html">富文本</el-radio>
           <el-radio value="link">外链</el-radio>
         </el-radio-group>
@@ -61,13 +63,20 @@
 
       <!-- 文章内容 -->
        <el-form-item label="文章内容" prop="content" v-if="paramsProps.row.contentType==='html'">
-        <WangEditor v-model="paramsProps.row.content" />
+        <WangEditor v-model="paramsProps.row.content" :disabled="disabled" />
        </el-form-item>
        <el-form-item label="外链地址" prop="content" v-else>
-        <el-input v-model="paramsProps.row.content"></el-input>
+        <el-input v-model="paramsProps.row.content" :disabled="disabled"></el-input>
        </el-form-item>
     </el-form>
-    <template #footer>
+    <template #footer v-if="paramsProps.row.status==='0'">
+      <el-button type="danger" v-auth="'sys.article.apply_btn'" @click="handleApply('-1')"> 拒绝 </el-button>
+      <el-button type="primary" v-auth="'sys.article.apply_btn'" @click="handleApply('1')"> 通过 </el-button>
+    </template>
+    <template #footer v-else-if="paramsProps.row.status==='-1'||paramsProps.row.status==='1'">
+      <el-button @click="visible = false"> 取消 </el-button>
+    </template>
+    <template #footer v-else>
       <el-button @click="visible = false"> 取消 </el-button>
       <el-button type="primary" @click="handleSubmit"> 确定 </el-button>
     </template>
@@ -101,6 +110,10 @@ const rules = ref({
   contentType: [{ required: true, message: '请选择内容类型' }],
 });
 
+const disabled = computed(() => {
+  return paramsProps.value.row.status==='0' || paramsProps.value.row.status==='-1' || paramsProps.value.row.status==='1'
+})
+
 const visible = ref(false);
 const paramsProps = ref<View.DefaultParams>({
   title: '',
@@ -114,7 +127,8 @@ const paramsProps = ref<View.DefaultParams>({
     content: '',
   },
   api: undefined,
-  getTableList: undefined
+  getTableList: undefined,
+  isAdd: false
 });
 
 // 接收父组件传过来的参数
@@ -150,6 +164,23 @@ const handleSubmit = () => {
   ruleFormRef.value!.validate(async (valid: boolean) => {
     if (!valid) return;
     try {
+      if(paramsProps.value.isAdd)paramsProps.value.row.status = '0';
+      await paramsProps.value.api!(paramsProps.value.row);
+      ElMessage.success({ message: `${paramsProps.value.title}成功！` });
+      paramsProps.value.getTableList!();
+      visible.value = false;
+    } catch (error) {
+      console.log(error);
+    }
+  });
+};
+
+//审批
+const handleApply = (status: any) => {
+  ruleFormRef.value!.validate(async (valid: boolean) => {
+    if (!valid) return;
+    try {
+      paramsProps.value.row.status = status;
       await paramsProps.value.api!(paramsProps.value.row);
       ElMessage.success({ message: `${paramsProps.value.title}成功！` });
       paramsProps.value.getTableList!();

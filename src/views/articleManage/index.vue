@@ -91,12 +91,44 @@ const columns: ColumnProps<any>[] = [
     width: 150
   },
   { prop: 'author', label: '文章作者', width: 120 },
+  { prop: 'status', tag: true, label: '状态',
+    enum: [
+      { value: '0', label: '待审核', type: 'info' },
+      { value: '1', label: '通过', type: 'success' },
+      { value: '-1', label: '拒绝', type: 'danger' }
+    ]
+   },
   { prop: 'sort', label: '排序' },
   { prop: 'operation', label: '操作', width: 180, fixed: 'right' }
 ];
 // 表格配置项
 const searchColumns: SearchProps[] = [
-  
+  {
+    prop: 'type',
+    label: '文章类型',
+    enum: useDictOptions('article_type'), // 使用字典数据
+    fieldNames: {
+      label: 'codeName',
+      value: 'id'
+    },
+    el: 'select',
+    props: {
+      placeholder: '请选择文章类型'
+    }
+  },
+  {
+    prop: 'status',
+    label: '状态',
+    enum: [
+      { value: '0', label: '待审核', type: 'info' },
+      { value: '1', label: '通过', type: 'success' },
+      { value: '-1', label: '拒绝', type: 'danger' }
+    ],
+    el: 'select',
+    props: {
+      placeholder: '请选择状态'
+    }
+  }
 ];
 
 // 获取 ProTable 元素，调用其获取刷新数据方法（还能获取到当前查询参数，方便导出携带参数）
@@ -111,7 +143,8 @@ const openBannerForm = (title: string, row = {}, isAdd = true) => {
     title,
     row: isAdd ? { sort: 0 } : { ...row },
     api: isAdd ? addArticle : editArticle,
-    getTableList: proTableRef.value?.getTableList
+    getTableList: proTableRef.value?.getTableList,
+    isAdd: isAdd
   };
   roleFormRef.value?.acceptParams(params);
 };

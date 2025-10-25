@@ -93,7 +93,7 @@ const columns: ColumnProps<any>[] = [
 ];
 // 表格配置项
 const searchColumns: SearchProps[] = [
-  { prop: 'title', label: '标题', el: 'input' },
+  { prop: 'title', label: '标题', el: 'input', props: {placeholder: '请填写标题'} },
   { 
     prop: 'category', 
     label: '分类', 
@@ -103,7 +103,8 @@ const searchColumns: SearchProps[] = [
       { value: '2', label: '钱高历史' },
     ],
     props: {
-      clearable: true
+      clearable: true,
+      placeholder: '请选择分类'
     }
   }
 ];
