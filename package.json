@@ -21,6 +21,7 @@
     "@wangeditor/editor": "^5.1.23",
     "@wangeditor/editor-for-vue": "^5.1.12",
     "axios": "^1.12.2",
+    "dayjs": "^1.11.18",
     "element-plus": "^2.11.5",
     "eslint-plugin-prettier": "^5.5.4",
     "globals": "^16.4.0",

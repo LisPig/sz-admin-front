@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { isArray } from '@/utils/is';
 import forge from 'node-forge';
 /**
@@ -362,4 +363,8 @@ export function aesEncrypt(message: string, secretKey: string) {
     iv: forge.util.encode64(iv),
     encryptedData: forge.util.encode64(encrypted + tag)
   };
+}
+
+export function formatDate(date:any) {
+  return dayjs(date).format('YYYY-MM-DD');
 }

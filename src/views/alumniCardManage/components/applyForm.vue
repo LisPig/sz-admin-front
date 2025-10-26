@@ -9,27 +9,24 @@
       @submit.enter.prevent="handleSubmit"
     >
 
-      <!-- 申请人手机号 -->
-      <el-form-item label="申请人手机号" prop="phone">
-        <el-input v-model="paramsProps.row.phone" disabled></el-input>
-      </el-form-item>
-
       <!-- 申请人姓名 -->
       <el-form-item label="申请人姓名" prop="name">
         <el-input v-model="paramsProps.row.name" disabled></el-input>
       </el-form-item>
 
-      <!-- 申请人身份证 -->
-      <el-form-item label="申请人身份证" prop="idCard">
-        <el-input v-model="paramsProps.row.idCard" disabled></el-input>
+      <!-- 申请人手机号 -->
+      <el-form-item label="手机号" prop="phone">
+        <el-input v-model="paramsProps.row.phone" disabled></el-input>
       </el-form-item>
 
-      <!-- 申请人身份 -->
-      <el-form-item label="申请人身份" prop="identity">
-        <el-select v-model="paramsProps.row.identity" disabled>
-          <el-option label="校友" :value="1"></el-option>
-          <el-option label="教师" :value="2"></el-option>
-        </el-select>
+      <!-- 返校时间 -->
+      <el-form-item label="返校时间" prop="time">
+        <el-input v-model="paramsProps.row.time" disabled></el-input>
+      </el-form-item>
+
+      <!-- 详细描述 -->
+      <el-form-item label="详细描述" prop="otherReason">
+        <el-input type="textarea" v-model="paramsProps.row.otherReason" disabled></el-input>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -42,6 +39,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { ElMessage } from 'element-plus';
+import { formatDate } from '@/utils/index';
 
 defineOptions({
   name: 'bannerForm'
@@ -57,9 +55,10 @@ const paramsProps = ref<View.DefaultParams>({
   row: {
     phone: '',
     name: '',
-    idCard: '',
-    identity: '',
+    expectedTime: '',
+    otherReason: '',
     status: '',
+    time: '',
   },
   api: undefined,
   getTableList: undefined
@@ -68,6 +67,7 @@ const paramsProps = ref<View.DefaultParams>({
 // 接收父组件传过来的参数
 const acceptParams = (params: View.DefaultParams) => {
   paramsProps.value = params;
+  paramsProps.value.row.time = formatDate(paramsProps.value.row.expectedTime);
   visible.value = true;
 };
 
@@ -77,8 +77,7 @@ const handleSubmit = (type:any) => {
   ruleFormRef.value!.validate(async (valid: boolean) => {
     if (!valid) return;
     try {
-      paramsProps.value.row.status = type==1? '2':'3';
-      await paramsProps.value.api!(paramsProps.value.row);
+      await paramsProps.value.api!({id: paramsProps.value.row.id, status: type});
       ElMessage.success({ message: `审批${type==1?'通过':'不通过'}！` });
       paramsProps.value.getTableList!();
       visible.value = false;
