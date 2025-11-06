@@ -1,7 +1,7 @@
 <template>
   <div class="footer flx-center">
     <a href="https://szadmin.cn" target="_blank">
-      Sz-Admin v{{ version }} | Copyright © 2022-{{ new Date().getFullYear() }} 升职哦（sz）
+      v{{ version }} | Copyright © 2025-{{ new Date().getFullYear() }} 苍南钱库高级中学
     </a>
   </div>
 </template>
