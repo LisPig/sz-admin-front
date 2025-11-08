@@ -80,18 +80,18 @@ export type FieldNamesProps = {
 export type RenderScope<T> = {
   row: T;
   $index: number;
-  column: TableColumnCtx<T>;
+  column: TableColumnCtx<any>;
   [key: string]: any;
 };
 
 export type HeaderRenderScope<T> = {
   $index: number;
-  column: TableColumnCtx<T>;
+  column: TableColumnCtx<any>;
   [key: string]: any;
 };
 
 export interface ColumnProps<T = any>
-  extends Partial<Omit<TableColumnCtx<T>, 'type' | 'children' | 'renderCell' | 'renderHeader'>> {
+  extends Partial<Omit<TableColumnCtx<any>, 'type' | 'children' | 'renderCell' | 'renderHeader'>> {
   type?: TypeProps; // 列类型
   tag?: boolean | Ref<boolean>; // 是否是标签展示
   tagLimit?: number; // 标签展示时，最多显示多少个标签，超过的会被隐藏, -1 为不限制
