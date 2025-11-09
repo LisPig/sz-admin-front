@@ -10,15 +10,15 @@ jobs:
   build:
     runs-on: ubuntu-latest # 在最新版本的 Ubuntu 运行器上执行
     env: # 定义环境变量
-      APP_NAME: sz-admin  // [!code highlight] // [!code focus] # 服务名称
-      RUNNING_ACTIVE: preview  // [!code highlight] // [!code focus] # 运行环境变量
-      SERVICE_PORT: 9800  // [!code warning] // [!code focus] # 服务运行的端口号，与 Dockerfile 中的 EXPOSE 属性一致
-      NGINX_CONF_DIR: /home/conf/sz-admin-nginx/conf.d  // [!code highlight] // [!code focus] # 远程服务器的 Nginx 配置文件路径
-      ACR_DOMAIN: crpi-yd2jqoe6cpca81vo.cn-hangzhou.personal.cr.aliyuncs.com // [!code highlight] // [!code focus] # Docker 镜像仓库域名
-      ACR_ZONE: solooxy  // [!code highlight] // [!code focus] # Docker 镜像命名空间
-      VERSION: latest  // [!code highlight] // [!code focus] # 镜像版本
-      SHELL_RUN_DIR: /home/run  // [!code highlight] // [!code focus] # 远程服务器脚本存储目录
-      VITE_PREVIEW: true  // [!code highlight] // [!code focus] # 是否启用预览模式，控制前端特定功能。仅在预览环境设置为true。
+      APP_NAME: sz-admin
+      RUNNING_ACTIVE: preview
+      SERVICE_PORT: 9800
+      NGINX_CONF_DIR: /home/conf/sz-admin-nginx/conf.d
+      ACR_DOMAIN: crpi-yd2jqoe6cpca81vo.cn-hangzhou.personal.cr.aliyuncs.com
+      ACR_ZONE: solooxy
+      VERSION: latest
+      SHELL_RUN_DIR: /home/run
+      VITE_PREVIEW: true
 
     steps:
       - name: Checkout repository # 检出代码仓库
