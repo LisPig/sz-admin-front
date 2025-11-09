@@ -74,7 +74,9 @@ jobs:
           script: |
             docker network create qg-network || true
             docker pull ${{ env.ACR_DOMAIN }}/${{ env.ACR_ZONE }}/${{ env.APP_NAME }}:${{ env.VERSION }}
-      
+            echo "==================== 检查并创建目录 ===================="
+            # 确保挂载目录存在
+            mkdir -p ${{ env.NGINX_CONF_DIR }}
             echo "==================== 生成启动命令脚本 ===================="
             mkdir -p ${{ env.SHELL_RUN_DIR }}
             START_SCRIPT="${{ env.SHELL_RUN_DIR }}/docker_run_${{ env.APP_NAME }}_${{ env.RUNNING_ACTIVE }}.sh"
