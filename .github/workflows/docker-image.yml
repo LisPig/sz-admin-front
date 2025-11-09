@@ -1,4 +1,4 @@
-name: Docker Sz-Admin CI # CI/CD 工作流名称
+name: Docker Sz-Admin-Prod CI # CI/CD 工作流名称
 
 on: 
   push: # 当推送代码到 "preview" 分支时触发
@@ -51,7 +51,7 @@ jobs:
 
       - name: Upload vitepress.conf if needed # 如果 vitepress.conf 文件不存在，则上传
         if: ${{ env.file_exists == 'false' }}
-        run: sshpass -p ${{ secrets.REMOTE_PASSWORD }} scp -o StrictHostKeyChecking=no ./nginx/vitepress.conf ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:${{ env.NGINX_CONF_DIR }}
+        run: sshpass -p ${{ secrets.REMOTE_PASSWORD }} scp -o StrictHostKeyChecking=no ./nginx/default.conf ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:${{ env.NGINX_CONF_DIR }}
 
       - name: Build Docker image # 构建 Docker 镜像
         run: docker build -t ${{ env.APP_NAME }}:${{ env.VERSION }} .
