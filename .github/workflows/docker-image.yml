@@ -1,0 +1,102 @@
+name: Docker Sz-Admin CI # CI/CD 工作流名称
+
+on: 
+  push: # 当推送代码到 "preview" 分支时触发
+    branches: [ "main" ]
+  pull_request: # 当有针对 "preview" 分支的 PR 时触发
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # 在最新版本的 Ubuntu 运行器上执行
+    env: # 定义环境变量
+      APP_NAME: sz-admin  // [!code highlight] // [!code focus] # 服务名称
+      RUNNING_ACTIVE: preview  // [!code highlight] // [!code focus] # 运行环境变量
+      SERVICE_PORT: 9800  // [!code warning] // [!code focus] # 服务运行的端口号，与 Dockerfile 中的 EXPOSE 属性一致
+      NGINX_CONF_DIR: /home/conf/sz-admin-nginx/conf.d  // [!code highlight] // [!code focus] # 远程服务器的 Nginx 配置文件路径
+      ACR_DOMAIN: crpi-yd2jqoe6cpca81vo.cn-hangzhou.personal.cr.aliyuncs.com // [!code highlight] // [!code focus] # Docker 镜像仓库域名
+      ACR_ZONE: solooxy  // [!code highlight] // [!code focus] # Docker 镜像命名空间
+      VERSION: latest  // [!code highlight] // [!code focus] # 镜像版本
+      SHELL_RUN_DIR: /home/run  // [!code highlight] // [!code focus] # 远程服务器脚本存储目录
+      VITE_PREVIEW: true  // [!code highlight] // [!code focus] # 是否启用预览模式，控制前端特定功能。仅在预览环境设置为true。
+
+    steps:
+      - name: Checkout repository # 检出代码仓库
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js # 配置 Node.js 环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # 使用 Node.js 20 版本
+
+      - name: Install pnpm # 全局安装 pnpm 包管理器
+        run: npm install -g pnpm
+
+      - name: Install dependencies # 安装项目依赖
+        run: pnpm install
+
+      - name: Build project # 构建项目
+        env:
+          VITE_PREVIEW: ${{ env.VITE_PREVIEW }} # 传递预览模式环境变量
+        run: pnpm run build
+
+      - name: Install sshpass # 安装 sshpass，用于非交互式 SSH 操作
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      - name: Check if vitepress.conf exists on remote # 检查远程服务器上是否存在 vitepress.conf 文件
+        id: check-file
+        run: |
+          file_exists=$(sshpass -p ${{ secrets.REMOTE_PASSWORD }} ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "if [ -f ${{ env.NGINX_CONF_DIR }}/default.conf ]; then echo true; else echo false; fi")
+          echo "file_exists=$file_exists" >> $GITHUB_ENV
+
+      - name: Upload vitepress.conf if needed # 如果 vitepress.conf 文件不存在，则上传
+        if: ${{ env.file_exists == 'false' }}
+        run: sshpass -p ${{ secrets.REMOTE_PASSWORD }} scp -o StrictHostKeyChecking=no ./nginx/vitepress.conf ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:${{ env.NGINX_CONF_DIR }}
+
+      - name: Build Docker image # 构建 Docker 镜像
+        run: docker build -t ${{ env.APP_NAME }}:${{ env.VERSION }} .
+
+      - name: Log in to ACR # 登录到 Docker 镜像仓库
+        run: echo "${{ secrets.ACR_PASSWORD }}" | docker login --username=${{ secrets.ACR_USERNAME }} ${{ env.ACR_DOMAIN }} --password-stdin
+
+      - name: Tag Docker image # 给 Docker 镜像打标签
+        run: docker tag ${{ env.APP_NAME }}:${{ env.VERSION }} ${{ env.ACR_DOMAIN }}/${{ env.ACR_ZONE }}/${{ env.APP_NAME }}:${{ env.VERSION }}
+
+      - name: Push Docker image to ACR # 推送 Docker 镜像到仓库
+        run: docker push ${{ env.ACR_DOMAIN }}/${{ env.ACR_ZONE }}/${{ env.APP_NAME }}:${{ env.VERSION }}
+
+      - name: Deploy to remote server # 部署到远程服务器
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.REMOTE_HOST }} # 远程服务器地址
+          username: ${{ secrets.REMOTE_USER }} # SSH 用户名
+          password: ${{ secrets.REMOTE_PASSWORD }} # SSH 密码
+          script: |
+            docker network create qg-network || true
+            docker pull ${{ env.ACR_DOMAIN }}/${{ env.ACR_ZONE }}/${{ env.APP_NAME }}:${{ env.VERSION }}
+
+            echo "==================== 生成启动命令脚本 ===================="
+            mkdir -p ${{ env.SHELL_RUN_DIR }}
+            START_SCRIPT="${{ env.SHELL_RUN_DIR }}/docker_run_${{ env.APP_NAME }}_${{ env.RUNNING_ACTIVE }}.sh"
+            cat > $START_SCRIPT <<EOL
+            #!/bin/bash
+              echo "==================== 停止旧应用容器 ===================="
+              docker stop ${{ env.APP_NAME }} || true 
+              docker rm ${{ env.APP_NAME }} || true 
+              docker image prune -f 
+              docker builder prune -f 
+              echo "==================== 启动应用容器 ===================="
+              docker run -itd \\ 
+              --name ${{ env.APP_NAME }} \\ 
+              --restart always \\ 
+              -p ${{ env.SERVICE_PORT }}:${{ env.SERVICE_PORT }} \\ 
+              -e TZ=Asia/Shanghai \\ 
+              -v ${{ env.NGINX_CONF_DIR }}:/etc/nginx/conf.d \\ 
+              --network qg-network \\
+              ${{ env.ACR_DOMAIN }}/${{ env.ACR_ZONE }}/${{ env.APP_NAME }}:${{ env.VERSION }}
+            EOL
+            chmod +x $START_SCRIPT # 赋予脚本执行权限
+            echo "启动脚本已生成：$START_SCRIPT"
+            echo "可以运行以下命令手动启动容器："
+            echo "bash $START_SCRIPT"
+            bash $START_SCRIPT # 执行生成的启动脚本
