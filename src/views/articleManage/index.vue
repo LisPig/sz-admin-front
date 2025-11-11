@@ -26,12 +26,22 @@
 
       <template #operation="{ row }">
         <el-button
+          v-if="row.status==='0'"
           type="primary"
           link
-          :icon="EditPen"
-          @click="openBannerForm('编辑文章', row, false)"
+          :icon="Finished"
+          @click="openBannerForm('审核文章', row, false)"
         >
-          编辑
+          审核
+        </el-button>
+        <el-button
+          v-else
+          type="primary"
+          link
+          :icon="View"
+          @click="openBannerForm('查看文章', row, false)"
+        >
+          查看
         </el-button>
         <el-button type="primary" link :icon="Delete" @click="deleteInfo(row)">
           删除
@@ -43,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { CirclePlus, Delete, EditPen, Lock } from '@element-plus/icons-vue';
+import { CirclePlus, Delete, EditPen, Finished, View } from '@element-plus/icons-vue';
 import ProTable from '@/components/ProTable/index.vue';
 import { useHandleData } from '@/hooks/useHandleData';
 import { getArticleList, addArticle, editArticle, deleteArticle } from '@/api/modules/article';

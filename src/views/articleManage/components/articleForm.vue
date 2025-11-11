@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="visible" :title="`${paramsProps.title}`" :destroy-on-close="true" width="1200px" draggable append-to-body>
+  <el-dialog v-model="visible" top="5vh" :title="`${paramsProps.title}`" :destroy-on-close="true" width="1200px" draggable append-to-body>
     <el-form
       ref="ruleFormRef"
       label-width="100px"
@@ -25,33 +25,41 @@
         </el-upload>
       </el-form-item>
 
-      <!-- 文章标题 -->
-       <el-form-item label="文章标题" prop="title">
-        <el-input v-model="paramsProps.row.title" :disabled="disabled"></el-input>
-       </el-form-item>
-
-       <!-- 文章类型 -->
+      
+       <el-row>
+        <el-col :span="6">
+          <!-- 文章标题 -->
+          <el-form-item label="文章标题" prop="title">
+            <el-input v-model="paramsProps.row.title" :disabled="disabled"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="6">
+          <!-- 文章类型 -->
        <el-form-item label="文章类型" prop="type">
         <el-select v-model="paramsProps.row.type" :disabled="disabled">
           <el-option v-for="item in articleType" :key="item.id" :label="item.codeName" :value="String(item.id)" />
         </el-select>
        </el-form-item>
-
-       <!-- 文章作者 -->
+        </el-col>
+        <el-col :span="6">
+          <!-- 文章作者 -->
        <el-form-item label="文章作者" prop="author">
         <el-input v-model="paramsProps.row.author" :disabled="disabled"></el-input>
        </el-form-item>
-
-      <!-- 排序字段 -->
+        </el-col>
+        <el-col :span="6">
+          <!-- 排序字段 -->
       <el-form-item label="排序" prop="sort">
         <el-input-number
           v-model="paramsProps.row.sort"
+          style="width: 100%;"
           :min="0"
-          :max="100"
           controls-position="right"
           :disabled="disabled"
         />
       </el-form-item>
+        </el-col>
+       </el-row>
 
       <!-- 内容类型 -->
        <el-form-item label="内容类型" prop="contentType">
@@ -213,12 +221,12 @@ defineExpose({
 :deep(.el-icon.avatar-uploader-icon) {
   font-size: 28px;
   color: #8c939d;
-  width: 178px;
+  width: 478px;
   height: 178px;
   text-align: center;
 }
 .avatar{
-  width: 178px;
+  width: 478px;
   height: 178px;
 }
 </style>
