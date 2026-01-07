@@ -8,48 +8,28 @@
       :model="paramsProps.row"
       @submit.enter.prevent="handleSubmit"
     >
-
-      <!-- 申请人手机号 -->
-      <el-form-item label="申请人手机号" prop="phone">
-        <el-input v-model="paramsProps.row.phone" disabled></el-input>
+      <el-form-item label="校友会头像" prop="avatar">
+        <img :src="paramsProps.row.avatar" style="width: 60px;height: 60px;" />
       </el-form-item>
 
-      <!-- 申请人姓名 -->
-      <el-form-item label="申请人姓名" prop="name">
+      <!-- 校友会名称 -->
+      <el-form-item label="校友会名称" prop="name">
         <el-input v-model="paramsProps.row.name" disabled></el-input>
       </el-form-item>
 
-      <!-- 申请人身份证 -->
-      <el-form-item label="申请人身份证" prop="idCard">
-        <el-input v-model="paramsProps.row.idCard" disabled></el-input>
+      <!-- 联系人 -->
+      <el-form-item label="联系人" prop="contract">
+        <el-input v-model="paramsProps.row.contract" disabled></el-input>
       </el-form-item>
 
-      <!-- 申请人身份 -->
-      <el-form-item label="申请人身份" prop="identity">
-        <el-select v-model="paramsProps.row.identity" disabled>
-          <el-option label="校友" :value="1"></el-option>
-          <el-option label="教师" :value="2"></el-option>
-        </el-select>
+      <!-- 联系电话 -->
+      <el-form-item label="联系电话" prop="phone">
+        <el-input v-model="paramsProps.row.phone" disabled></el-input>
       </el-form-item>
 
-      <!-- 毕业信息 -->
-      <el-form-item label="毕业信息" prop="graduateInfo">
-        <el-input v-model="paramsProps.row.graduateInfo" disabled></el-input>
-      </el-form-item>
-
-      <!-- 工作单位 -->
-      <el-form-item label="工作单位" prop="workUnit">
-        <el-input v-model="paramsProps.row.workUnit" disabled></el-input>
-      </el-form-item>
-
-      <!-- 职务 -->
-      <el-form-item label="职务" prop="jobInfo">
-        <el-input v-model="paramsProps.row.jobInfo" disabled></el-input>
-      </el-form-item>
-
-      <!-- 在本校工作时间 -->
-      <el-form-item label="在本校工作时间" prop="workTime">
-        <el-input v-model="paramsProps.row.workTime" disabled></el-input>
+      <!-- 简介 -->
+      <el-form-item label="简介" prop="description">
+        <el-input type="textarea" v-model="paramsProps.row.description" disabled></el-input>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -75,15 +55,12 @@ const visible = ref(false);
 const paramsProps = ref<View.DefaultParams>({
   title: '',
   row: {
-    phone: '',
+    avatar: '',
     name: '',
-    idCard: '',
-    identity: '',
+    contract: '',
+    phone: '',
     status: '',
-    graduateInfo: '',
-    workUnit: '',
-    jobInfo: '',
-    workTime: '',
+    description: '',
   },
   api: undefined,
   getTableList: undefined
@@ -101,7 +78,7 @@ const handleSubmit = (type:any) => {
   ruleFormRef.value!.validate(async (valid: boolean) => {
     if (!valid) return;
     try {
-      paramsProps.value.row.status = type==1? '2':'3';
+      paramsProps.value.row.status = type==1? '1':'2';
       await paramsProps.value.api!(paramsProps.value.row);
       ElMessage.success({ message: `审批${type==1?'通过':'不通过'}！` });
       paramsProps.value.getTableList!();

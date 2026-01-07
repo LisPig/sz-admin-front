@@ -77,7 +77,7 @@ const columns: ColumnProps<any>[] = [
   { prop: 'status', tag: true, label: '状态',
     enum: [
       { value: 1, label: '启用', type: 'success' },
-      { value: 0, label: '禁用', type: 'danger' }
+      { value: 0, label: '禁用', type: 'error' }
     ]
    },
   { prop: 'sort', label: '排序' },
