@@ -2,7 +2,7 @@
   <div class="table-box">
     <ProTable
       ref="proTableRef"
-      title="校友会列表"
+      title="校友会活动列表"
       :indent="20"
       :columns="columns"
       :search-columns="searchColumns"
@@ -16,7 +16,7 @@
           type="primary"
           link
           :icon="Check"
-          @click="openAuthForm('校友会申请审批', row)"
+          @click="openAuthForm('活动申请审批', row)"
         >
           审批
         </el-button>
@@ -29,13 +29,13 @@
 <script setup lang="ts">
 import { Check } from '@element-plus/icons-vue';
 import ProTable from '@/components/ProTable/index.vue';
-import { getAlumniAssociationList, editAlumniAssociation } from '@/api/modules/alumniAssociation';
-import Forms from '@/views/alumniAssociationManage/components/Forms.vue';
+import { getAlumniActivityList, applyAlumniActivity } from '@/api/modules/alumniAssociationActivity';
+import Forms from '@/views/alumniAssociationActivity/components/Forms.vue';
 import type { ColumnProps, ProTableInstance, SearchProps } from '@/components/ProTable/interface';
 import { ref, h } from 'vue';
 
 defineOptions({
-  name: 'alumniAssociationManage'
+  name: 'alumniAssociationActivity'
 });
 
 // 表格配置项
@@ -44,7 +44,7 @@ const columns: ColumnProps<any>[] = [
   { prop: 'id', label: '编号', width: 80 },
   { 
     prop: 'avatar', 
-    label: '校友会头像',
+    label: '活动主图',
     align: 'center',
     width: 100,
     render: (scope) => {
@@ -58,10 +58,9 @@ const columns: ColumnProps<any>[] = [
         : h('span', '');
     }
   },
-  { prop: 'name', label: '校友会名称' },
-  { prop: 'contract', label: '联系人', width: 150 },
-  { prop: 'phone', label: '联系方式', width: 120 },
-  { prop: 'status', tag: true, label: '状态', width: 100, 
+  { prop: 'title', label: '活动名称' },
+  { prop: 'time', label: '活动时间' },
+  { prop: 'status', tag: true, label: '状态', width: 100,
     enum: [
       { value: '0', label: '待审批', tagType: 'info' },
       { value: '1', label: '正常', tagType: 'success' },
@@ -72,21 +71,34 @@ const columns: ColumnProps<any>[] = [
 ];
 // 表格配置项
 const searchColumns: SearchProps[] = [
-  
+  { prop: 'title', label: '活动标题', el: 'input', props: {placeholder: '请输入'} },
+ {
+    prop: 'status',
+    label: '状态',
+    enum: [
+      { value: '0', label: '待审核', type: 'info' },
+      { value: '1', label: '通过', type: 'success' },
+      { value: '2', label: '禁用', type: 'danger' }
+    ],
+    el: 'select',
+    props: {
+      placeholder: '请选择状态'
+    }
+  }
 ];
 
 // 获取 ProTable 元素，调用其获取刷新数据方法（还能获取到当前查询参数，方便导出携带参数）
 const proTableRef = ref<ProTableInstance>();
 
 // 获取table列表
-const getTableList = (params: any) => getAlumniAssociationList(params);
+const getTableList = (params: any) => getAlumniActivityList(params);
 
 const roleFormRef = ref<any>();
 const openAuthForm = (title: string, row = {}) => {
   const params: View.DefaultParams = {
     title,
     row: { ...row },
-    api: editAlumniAssociation,
+    api: applyAlumniActivity,
     getTableList: proTableRef.value?.getTableList
   };
   roleFormRef.value?.acceptParams(params);
