@@ -16,5 +16,5 @@ export const getAlumniActivityList = (params: any) => {
  * @returns {*}
  */
 export const applyAlumniActivity = (params: any) => {
-  return http.put(ADMIN_MODULE + `/applet-alumni-association-activity`, params);
+  return http.post(ADMIN_MODULE + `/applet-alumni-association-activity/approve`, params);
 };
