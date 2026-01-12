@@ -9,6 +9,17 @@
       :request-api="getTableList"
     >
       <!-- 表格 header 按钮 -->
+       <template #tableHeader="scope">
+        <el-button
+          type="danger"
+          :icon="Delete"
+          plain
+          :disabled="!scope.isSelected"
+          @click="batchDelete(scope.selectedListIds)"
+        >
+          批量删除
+        </el-button>
+      </template>
 
       <template #operation="{ row }">
         <el-button
@@ -20,6 +31,9 @@
         >
           审批
         </el-button>
+        <el-button type="primary" link :icon="Delete" @click="deleteInfo(row)">
+          删除
+        </el-button>
       </template>
     </ProTable>
     <Forms ref="roleFormRef" />
@@ -27,12 +41,13 @@
 </template>
 
 <script setup lang="ts">
-import { Check } from '@element-plus/icons-vue';
+import { Check, Delete } from '@element-plus/icons-vue';
 import ProTable from '@/components/ProTable/index.vue';
-import { getAlumniAssociationList, editAlumniAssociation } from '@/api/modules/alumniAssociation';
+import { getAlumniAssociationList, editAlumniAssociation, deleteAlumniAssociation } from '@/api/modules/alumniAssociation';
 import Forms from '@/views/alumniAssociationManage/components/Forms.vue';
 import type { ColumnProps, ProTableInstance, SearchProps } from '@/components/ProTable/interface';
 import { ref, h } from 'vue';
+import { useHandleData } from '@/hooks/useHandleData';
 
 defineOptions({
   name: 'alumniAssociationManage'
@@ -68,7 +83,7 @@ const columns: ColumnProps<any>[] = [
       { value: '2', label: '禁用', tagType: 'danger' },
     ]
    },
-  { prop: 'operation', label: '操作', width: 120, fixed: 'right' }
+  { prop: 'operation', label: '操作', width: 150, fixed: 'right' }
 ];
 // 表格配置项
 const searchColumns: SearchProps[] = [
@@ -90,5 +105,18 @@ const openAuthForm = (title: string, row = {}) => {
     getTableList: proTableRef.value?.getTableList
   };
   roleFormRef.value?.acceptParams(params);
+};
+
+// 删除信息
+const deleteInfo = async (params: any) => {
+  await useHandleData(deleteAlumniAssociation, { ids: [params.id] }, `删除该校友会`);
+  proTableRef.value?.getTableList();
+};
+
+// 批量删除
+const batchDelete = async (ids: (string | number)[]) => {
+  await useHandleData(deleteAlumniAssociation, { ids }, '删除所选校友会');
+  proTableRef.value?.clearSelection();
+  proTableRef.value?.getTableList();
 };
 </script>

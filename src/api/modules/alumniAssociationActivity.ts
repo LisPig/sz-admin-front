@@ -18,3 +18,12 @@ export const getAlumniActivityList = (params: any) => {
 export const applyAlumniActivity = (params: any) => {
   return http.post(ADMIN_MODULE + `/applet-alumni-association-activity/approve`, params);
 };
+
+/**
+ * 删除校友会活动
+ * @param params
+ * @returns {*}
+ */
+export const deleteAlumniActivity = (params: { ids: number[] }) => {
+  return http.delete(ADMIN_MODULE + `/applet-alumni-association-activity`, params);
+};
