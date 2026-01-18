@@ -94,7 +94,15 @@ const roleFormRef = ref<any>();
 const openBannerForm = (title: string, row = {}, isAdd = true) => {
   const params: View.DefaultParams = {
     title,
-    row: row,
+    row: {
+      cover: '',
+      year: '',
+      classNo: '',
+      teacherList: '',
+      studentList: '',
+      images: "",
+      ...row
+    },
     api: isAdd ? addSchoolClassMemory : editSchoolClassMemory,
     getTableList: proTableRef.value?.getTableList
   };
