@@ -18,7 +18,7 @@ jobs:
       ACR_ZONE: solooxy
       VERSION: latest
       SHELL_RUN_DIR: /home/run
-      VITE_PREVIEW: true
+      VITE_PREVIEW: false
 
     steps:
       - name: Checkout repository # 检出代码仓库
