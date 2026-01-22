@@ -127,11 +127,15 @@ const handlePictureCardPreview = (uploadFile:any) => {
 
 // 接收父组件传过来的参数
 const acceptParams = (params: View.DefaultParams) => {
-  fileList.value = params.row.images.split(',').map((url:any, index:any) => ({
-    url: url, // 每个数组元素存入对象的url属性
-    uid: index,
-    name: url,
-  }));
+  if(params.row.images===''){
+    fileList.value = [];
+  }else{
+    fileList.value = params.row.images.split(',').map((url:any, index:any) => ({
+      url: url, // 每个数组元素存入对象的url属性
+      uid: index,
+      name: url,
+    }));
+  }
   paramsProps.value = params;
   visible.value = true;
 };
