@@ -67,7 +67,7 @@
     </template>
   </el-dialog>
   <el-dialog v-model="dialogVisible">
-    <img w-full :src="dialogImageUrl" alt="Preview Image" />
+    <img w-full :src="dialogImageUrl" alt="Preview Image" style="max-width: 100%; max-height: 80vh;"/>
   </el-dialog>
 </template>
 

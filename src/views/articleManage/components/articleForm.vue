@@ -119,7 +119,18 @@ const rules = ref({
 });
 
 const disabled = computed(() => {
-  return paramsProps.value.row.status==='0' || paramsProps.value.row.status==='-1' || paramsProps.value.row.status==='1'
+  // 如果是"查看文章"或"审核文章"操作，则根据状态判断是否禁用
+  if (paramsProps.value.title.includes('查看') || paramsProps.value.title.includes('审核')) {
+    return paramsProps.value.row.status === '0' || paramsProps.value.row.status === '-1' || paramsProps.value.row.status === '1';
+  }
+  
+  // 如果是"编辑文章"操作，只有在文章被拒绝时才禁用编辑，已通过的文章允许编辑
+  if (paramsProps.value.title.includes('编辑')) {
+    return paramsProps.value.row.status === '-1'; // 只有拒绝状态(-1)才禁用编辑
+  }
+  
+  // 新增操作不受限制
+  return false;
 })
 
 const visible = ref(false);

@@ -43,6 +43,14 @@
         >
           查看
         </el-button>
+        <el-button
+          type="primary"
+          link
+          :icon="EditPen"
+          @click="openBannerForm('编辑文章', row, false)"
+        >
+          编辑
+        </el-button>
         <el-button type="primary" link :icon="Delete" @click="deleteInfo(row)">
           删除
         </el-button>
