@@ -41,7 +41,32 @@
       </el-form-item>
 
       <el-form-item label="学生列表" prop="studentList">
-        <el-input type="textarea" v-model="paramsProps.row.studentList"></el-input>
+        <div class="student-table">
+          <div 
+            v-for="(row, rowIndex) in studentRows" 
+            :key="rowIndex" 
+            class="student-row"
+          >
+            <span class="row-label">{{ rowIndex + 1 }}排 |</span>
+            <el-input
+              v-model="row.students"
+              class="student-input"
+              placeholder="请输入学生姓名，用逗号分隔"
+            />
+            <el-button 
+              type="danger" 
+              link 
+              @click="removeStudentRow(rowIndex)"
+              class="remove-row-btn"
+            >
+              <el-icon><Minus /></el-icon>
+            </el-button>
+          </div>
+          
+          <el-button type="success" link @click="addStudentRow">
+            <el-icon><Plus /></el-icon> 添加新排
+          </el-button>
+        </div>
       </el-form-item>
 
       <el-form-item label="照片">
@@ -72,9 +97,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue';
-import { ElMessage } from 'element-plus';
-import { Plus } from '@element-plus/icons-vue';
+import { ref, computed, nextTick, watch } from 'vue';
+import { ElMessage, ElMessageBox } from 'element-plus';
+import { Plus, Minus } from '@element-plus/icons-vue';
 import { useUserStore } from '@/stores/modules/user';
 const userStore = useUserStore();
 
@@ -108,6 +133,67 @@ const paramsProps = ref<View.DefaultParams>({
   getTableList: undefined
 });
 
+// 学生列表行数据，每行包含一个字符串，表示该排的学生列表
+const studentRows = ref<Array<{ students: string }>>([
+  { students: '' } // 初始化一行，包含一个空输入框
+]);
+
+// 监听参数变化，更新学生列表显示
+watch(
+  () => paramsProps.value.row.studentList,
+  (newVal) => {
+    if (newVal) {
+      parseStudentList(newVal);
+    } else {
+      studentRows.value = [{ students: '' }];
+    }
+  },
+  { immediate: true }
+);
+
+// 解析学生列表字符串为表格数据
+const parseStudentList = (str: string) => {
+  if (!str) {
+    studentRows.value = [{ students: '' }];
+    return;
+  }
+
+  try {
+    // 尝试解析JSON格式的学生列表
+    const parsed = JSON.parse(str);
+    if (Array.isArray(parsed)) {
+      studentRows.value = parsed.map(item => ({ students: item.students || item }));
+    } else {
+      // 如果不是JSON格式，尝试逗号分隔
+      const rows = str.split(';');
+      studentRows.value = rows.map(row => ({
+        students: row || ''
+      }));
+    }
+  } catch (e) {
+    // 如果JSON解析失败，尝试旧格式
+    const rows = str.split(';');
+    studentRows.value = rows.map(row => ({
+      students: row || ''
+    }));
+  }
+};
+
+// 添加新行
+const addStudentRow = () => {
+  studentRows.value.push({ students: '' });
+};
+
+// 删除指定行
+const removeStudentRow = (rowIndex: number) => {
+  if (studentRows.value.length > 1) {
+    studentRows.value.splice(rowIndex, 1);
+  } else {
+    // 如果只有一行，清空内容而不是删除
+    studentRows.value[0].students = '';
+  }
+};
+
 const fileList = ref([]);
 
 const dialogImageUrl = ref('')
@@ -127,7 +213,8 @@ const handlePictureCardPreview = (uploadFile:any) => {
 
 // 接收父组件传过来的参数
 const acceptParams = (params: View.DefaultParams) => {
-  if(params.row.images===''){
+  // 处理图片列表
+  if(!params.row.images || params.row.images === ''){
     fileList.value = [];
   }else{
     fileList.value = params.row.images.split(',').map((url:any, index:any) => ({
@@ -136,7 +223,16 @@ const acceptParams = (params: View.DefaultParams) => {
       name: url,
     }));
   }
+  
   paramsProps.value = params;
+  
+  // 初始化学生列表
+  if (params.row.studentList) {
+    parseStudentList(params.row.studentList);
+  } else {
+    studentRows.value = [{ students: '' }];
+  }
+  
   visible.value = true;
 };
 
@@ -177,6 +273,14 @@ const handleUploadSuccess2 = (response:any, file:any) => {
 // 提交数据（新增/编辑）
 const ruleFormRef = ref();
 const handleSubmit = () => {
+  // 将学生列表转换为字符串格式保存
+  const studentListStr = studentRows.value
+    .map(row => row.students.trim())
+    .filter(rowStr => rowStr !== '')
+    .join(';');
+  
+  paramsProps.value.row.studentList = studentListStr;
+  
   let imgs = fileList.value.map((item:any)=>{
     return item.url
   })
@@ -223,5 +327,33 @@ defineExpose({
 .avatar{
   width: 178px;
   height: 178px;
+}
+
+.student-table {
+  width: 100%;
+}
+
+.student-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  
+  .row-label {
+    margin-right: 10px;
+    min-width: 40px;
+    text-align: left;
+  }
+  
+  .student-input {
+    width: calc(100% - 80px); /* 占满剩余空间 */
+    margin-right: 10px;
+    margin-bottom: 5px;
+  }
+  
+  .remove-row-btn {
+    margin-right: 5px;
+    margin-bottom: 5px;
+  }
 }
 </style>

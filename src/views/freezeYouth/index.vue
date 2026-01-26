@@ -81,16 +81,7 @@ const columns: ColumnProps<any>[] = [
 ];
 // 表格配置项
 const searchColumns: SearchProps[] = [
-  {
-    prop: 'year',
-    label: '届数',
-    el: 'date-picker',
-    props: {
-      type: 'year',
-      format: 'YYYY',
-      valueFormat: 'YYYY'
-    }
-  }
+  
 ];
 
 // 获取 ProTable 元素，调用其获取刷新数据方法（还能获取到当前查询参数，方便导出携带参数）
@@ -103,15 +94,7 @@ const roleFormRef = ref<any>();
 const openBannerForm = (title: string, row = {}, isAdd = true) => {
   const params: View.DefaultParams = {
     title,
-    row: {
-      cover: '',
-      year: '',
-      classNo: '',
-      teacherList: '',
-      studentList: '',
-      images: "",
-      ...row
-    },
+    row: row,
     api: isAdd ? addSchoolClassMemory : editSchoolClassMemory,
     getTableList: proTableRef.value?.getTableList
   };

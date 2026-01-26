@@ -77,11 +77,11 @@
         <el-input v-model="paramsProps.row.content" :disabled="disabled"></el-input>
        </el-form-item>
     </el-form>
-    <template #footer v-if="paramsProps.row.status==='0'">
+    <template #footer v-if="paramsProps.row.status==='0' && !paramsProps.title.includes('编辑')">
       <el-button type="danger" v-auth="'sys.article.apply_btn'" @click="handleApply('-1')"> 拒绝 </el-button>
       <el-button type="primary" v-auth="'sys.article.apply_btn'" @click="handleApply('1')"> 通过 </el-button>
     </template>
-    <template #footer v-else-if="paramsProps.row.status==='-1'||paramsProps.row.status==='1'">
+    <template #footer v-else-if="(paramsProps.row.status==='-1'||paramsProps.row.status==='1') && !paramsProps.title.includes('编辑')">
       <el-button @click="visible = false"> 取消 </el-button>
     </template>
     <template #footer v-else>
