@@ -37,14 +37,16 @@
       </template>
     </ProTable>
     <Forms ref="roleFormRef" />
+    <Detail ref="detailRef" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { Check, Delete } from '@element-plus/icons-vue';
+import { Check, Delete, View } from '@element-plus/icons-vue';
 import ProTable from '@/components/ProTable/index.vue';
 import { getAlumniActivityList, applyAlumniActivity, deleteAlumniActivity } from '@/api/modules/alumniAssociationActivity';
 import Forms from '@/views/alumniAssociationActivity/components/Forms.vue';
+import Detail from '@/views/alumniAssociationActivity/components/Detail.vue'; // 新增详情组件
 import type { ColumnProps, ProTableInstance, SearchProps } from '@/components/ProTable/interface';
 import { ref, h } from 'vue';
 import { useHandleData } from '@/hooks/useHandleData';
@@ -57,6 +59,7 @@ defineOptions({
 const columns: ColumnProps<any>[] = [
   { type: 'selection', width: 80, selectable: row => row.isLock !== 'T' },
   { prop: 'id', label: '编号', width: 80 },
+  { prop: 'alumniAssociationName', label: '所属校会' },
   { 
     prop: 'avatar', 
     label: '活动主图',
@@ -82,7 +85,7 @@ const columns: ColumnProps<any>[] = [
       { value: '2', label: '禁用', tagType: 'danger' },
     ]
    },
-  { prop: 'operation', label: '操作', width: 150, fixed: 'right' }
+  { prop: 'operation', label: '操作', width: 220, fixed: 'right' }
 ];
 // 表格配置项
 const searchColumns: SearchProps[] = [
@@ -109,6 +112,8 @@ const proTableRef = ref<ProTableInstance>();
 const getTableList = (params: any) => getAlumniActivityList(params);
 
 const roleFormRef = ref<any>();
+const detailRef = ref<any>(); // 详情组件引用
+
 const openAuthForm = (title: string, row = {}) => {
   const params: View.DefaultParams = {
     title,
@@ -117,6 +122,11 @@ const openAuthForm = (title: string, row = {}) => {
     getTableList: proTableRef.value?.getTableList
   };
   roleFormRef.value?.acceptParams(params);
+};
+
+// 打开详情对话框
+const openDetail = (id: number) => {
+  detailRef.value?.openDialog(id);
 };
 
 // 删除信息

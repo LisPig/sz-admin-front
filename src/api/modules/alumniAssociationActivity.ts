@@ -11,6 +11,15 @@ export const getAlumniActivityList = (params: any) => {
 };
 
 /**
+ * 获取校友会活动详情
+ * @param id
+ * @returns {*}
+ */
+export const getAlumniActivityDetail = (id: number) => {
+  return http.get(ADMIN_MODULE + `/applet-alumni-association-activity/${id}`);
+};
+
+/**
  * 活动申请审批
  * @param params
  * @returns {*}

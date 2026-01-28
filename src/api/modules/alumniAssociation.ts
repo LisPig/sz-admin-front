@@ -11,6 +11,24 @@ export const getAlumniAssociationList = (params: any) => {
 };
 
 /**
+ * 获取校友会详情
+ * @param id
+ * @returns {*}
+ */
+export const getAlumniAssociationDetail = (id: number) => {
+  return http.get(ADMIN_MODULE + `/applet-alumni-association/info/${id}`);
+};
+
+/**
+ * 更新校友会信息
+ * @param params
+ * @returns {*}
+ */
+export const updateAlumniAssociation = (params: any) => {
+  return http.put(ADMIN_MODULE + `/applet-alumni-association`, params);
+};
+
+/**
  * 申请审批
  * @param params
  * @returns {*}
