@@ -81,7 +81,16 @@ const columns: ColumnProps<any>[] = [
 ];
 // 表格配置项
 const searchColumns: SearchProps[] = [
-  
+  {
+    prop: 'year',
+    label: '届数',
+    el: 'date-picker',
+    props: {
+      type: 'year',
+      format: 'YYYY',
+      valueFormat: 'YYYY'
+    }
+  }
 ];
 
 // 获取 ProTable 元素，调用其获取刷新数据方法（还能获取到当前查询参数，方便导出携带参数）
